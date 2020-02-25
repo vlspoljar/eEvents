@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:outputStylesheet name="primeicons/primeicons.css" library="primefaces" />
+
+<h:head></h:head>
+<body>
+<h:form id="form">
+    <title> eEvents </title>
+
+    <p:growl id="message" life="2000" />
+
+    <p:layout fullPage="true">
+        <p:layoutUnit position="north" size="225" header="eEvents" resizable="false" closable="false" collapsible="false">
+            <p:panelGrid id="filterPanelGridId" columns="6" styleClass="ui-noborder">
+                <p:panelGrid id="filterPanelGrid1Id" columns="1" styleClass="ui-noborder">
+                    <p:inputText id="filterName" value="#{eventController.filterEvent.name}" placeholder="Filter name" size="25" />
+                    <p:calendar id="filterDateFrom" value="#{eventController.filterEvent.dateFrom}" placeholder="Filter date from" pattern="dd.MM.yyyy HH:mm" timeZone="CET" size="12" />
+                    <p:calendar id="filterDateTo" value="#{eventController.filterEvent.dateTo}" placeholder="Filter date to" pattern="dd.MM.yyyy HH:mm" timeZone="CET" size="12" />
+                    <p:selectOneButton id="filterFreeEntrance" value="#{eventController.filterFree}" label="Free entrance">
+                        <f:selectItem itemLabel="Yes" itemValue="DA" />
+                        <f:selectItem itemLabel="Free entrance" itemValue="null" />
+                        <f:selectItem itemLabel="No" itemValue="NE" />
+                    </p:selectOneButton>
+                </p:panelGrid>
+                <p:panelGrid id="filterPanelGrid2Id" columns="1" styleClass="ui-noborder">
+                    <p:selectManyCheckbox id="filterRegion" value="#{eventController.selectedRegions}" layout="pageDirection" columns="1">
+                        <f:selectItems value="#{eventController.listRegions}" var="region" itemLabel="#{region.name}" itemValue="#{region.id}" />
+                        <p:ajax event="change" update=":form:filterPanelGrid3Id" listener="#{eventController.changeRegion}" />
+                    </p:selectManyCheckbox>
+                </p:panelGrid>
+                <p:panelGrid id="filterPanelGrid3Id" columns="1" styleClass="ui-noborder">
+                    <p:selectManyMenu id="filterCounty" value="#{eventController.selectedCounties}" filter="true" filterMatchMode="contains" style="width: 300px;" scrollHeight="100">
+                        <f:selectItems id="listCountiesId" value="#{eventController.listCounties}" var="county" itemLabel="#{county.name}" itemValue="#{county.id}" />
+                        <p:ajax event="change" update=":form:filterPanelGrid5Id" listener="#{eventController.changeCounty}" />
+                        <p:column>
+                            <h:outputText value="#{county.name}" />
+                        </p:column>
+                    </p:selectManyMenu>
+                </p:panelGrid>
+                <p:panelGrid id="filterPanelGrid4Id" columns="1" styleClass="ui-noborder">
+                    <p:selectManyCheckbox id="filterCityType" value="#{eventController.selectedCityTypes}" layout="pageDirection" columns="1">
+                        <f:selectItems value="#{eventController.listCityTypes}" var="cityType" itemLabel="#{cityType.name}" itemValue="#{cityType.id}" />
+                        <p:ajax event="change" update=":form:filterPanelGrid5Id" listener="#{eventController.changeCityType}" />
+                    </p:selectManyCheckbox>
+                </p:panelGrid>
+                <p:panelGrid id="filterPanelGrid5Id" columns="1" styleClass="ui-noborder">
+                    <p:selectManyMenu id="filterCity" value="#{eventController.selectedCities}" filter="true" filterMatchMode="contains" style="width: 200px;" scrollHeight="100">
+                        <f:selectItems id="listCitiesId" value="#{eventController.listCities}" var="city" itemLabel="#{city.name}" itemValue="#{city.id}" />
+                        <p:column>
+                            <h:outputText value="#{city.name}" />
+                        </p:column>
+                    </p:selectManyMenu>
+                </p:panelGrid>
+                <p:panelGrid id="filterPanelGrid6Id" columns="1" styleClass="ui-noborder">
+                    <p:commandButton value="Reset" id="resetFilterForm" action="#{eventController.resetFilterFormAction}" update=":form:filterPanelGridId :form:listEventsId" icon="pi pi-replay" />
+                    <p:commandButton value="Filter" id="filter" action="#{eventController.filterAction}" update=":form:listEventsId" icon="pi pi-filter" />
+                </p:panelGrid>
+            </p:panelGrid>
+        </p:layoutUnit>
+
+        <p:layoutUnit position="east" size="400" resizable="false" closable="false" collapsible="false">
+            <p:panelGrid id="inputPanelGridId" columns="1" styleClass="ui-noborder">
+                <p:inputText id="inputId" value="#{eventController.createEvent.id}" placeholder="ID" readonly="true" disabled="true" size="4" />
+                <p:inputText id="inputName" value="#{eventController.createEvent.name}" placeholder="Name" size="25" />
+                <p:calendar id="inputDateFrom" value="#{eventController.createEvent.dateFrom}" placeholder="Date from" pattern="dd.MM.yyyy HH:mm" timeZone="CET" size="12" />
+                <p:calendar id="inputDateTo" value="#{eventController.createEvent.dateTo}" placeholder="Date to" pattern="dd.MM.yyyy HH:mm" timeZone="CET" size="12" />
+                <p:selectBooleanCheckbox id="inputFreeEntrance" value="#{eventController.inputFree}" itemLabel="Free entrance"/>
+                <p:selectOneMenu id="inputCity" value="#{eventController.createEvent.cityId.id}" filter="true" filterMatchMode="startsWith">
+                    <f:selectItem itemLabel="Select One" itemValue="" />
+                    <f:selectItems value="#{eventController.cities}" />
+                </p:selectOneMenu>
+                <p:panel>
+                    <p:commandButton value="Save" id="save" action="#{eventController.saveAction}" update=":form:inputPanelGridId, :form:listEventsId :form:message" style="padding: .1em 0.1em .1em .1em; margin-right: 2px;" icon="pi pi-save" />
+                    <p:commandButton value="Delete" id="delete" action="#{eventController.deleteAction}" update=":form:inputPanelGridId, :form:listEventsId :form:message" style="padding: .1em 0.1em .1em .1em; margin-right: 2px;" icon="pi pi-trash" disabled="#{eventController.createEvent.id == null}"/>
+                    <p:commandButton value="Reset" id="resetInputForm" action="#{eventController.resetInputFormAction}" update=":form:inputPanelGridId" style="padding: .1em 0.1em .1em .1em;" icon="pi pi-replay" />
+                </p:panel>
+            </p:panelGrid>
+        </p:layoutUnit>
+
+        <p:layoutUnit position="center">
+            <p:dataTable id="listEventsId" var="event" value="#{eventController.listEvents}" selectionMode="single" rowKey="#{event.id}"
+                            rows="10" rowsPerPageTemplate="5,10,15" paginator="true"
+                            paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            emptyMessage="No events found">
+                <f:facet name="header">
+                    All Events
+                </f:facet>
+                <p:ajax event="rowSelect" listener="#{eventController.onRowSelect}" update=":form:inputPanelGridId" />
+                <p:column headerText="ID" sortBy="#{event.id}" style="width:50px;text-align:center">
+                    <h:outputText value="#{event.id}" />
+                </p:column>
+                <p:column headerText="Name" sortBy="#{event.name}">
+                    <h:outputText value="#{event.name}" />
+                </p:column>
+                <p:column headerText="Date from" sortBy="#{event.dateFrom}" style="width:150px;text-align:center">
+                    <h:outputText value="#{event.dateFrom}">
+                        <f:convertDateTime pattern="dd.MM.yyyy HH:mm" timeZone="CET" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Date to" sortBy="#{event.dateTo}" style="width:150px;text-align:center">
+                    <h:outputText value="#{event.dateTo}">
+                        <f:convertDateTime pattern="dd.MM.yyyy HH:mm" timeZone="CET" />
+                    </h:outputText>
+                </p:column>
+                <p:column headerText="Free entrance" sortBy="#{event.freeEntrance}" style="width:150px;text-align:center">
+                    <p:selectBooleanCheckbox id="checkboxFreeEntrance" value="#{event.freeEntrance == 'DA'}" disabled="true" />
+                </p:column>
+                <p:column headerText="City" sortBy="#{event.cityId.name}" style="width:200px;text-align:center">
+                    <h:outputText value="#{event.cityId.name}" />
+                </p:column>
+            </p:dataTable>
+        </p:layoutUnit>
+
+    </p:layout>
+
+</h:form>
+</body>
+</html>
